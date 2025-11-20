@@ -1,0 +1,136 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:TaskManagement.ViewModels"
+        xmlns:m="using:TaskManagement.Models"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="TaskManagement.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="{Binding ViewNavigator.SelectedViewModel.Title}">
+    <SplitView
+        DisplayMode="CompactOverlay"
+        CompactPaneLength="90"
+        OpenPaneLength="250"
+        IsPaneOpen="{Binding #menuBtn.IsChecked, Mode=TwoWay}">
+        <SplitView.Pane>
+            <DockPanel Background="CornflowerBlue">
+                <StackPanel Orientation="Horizontal"
+                            Spacing="10"
+                            Margin="0,10,0,0"
+                            DockPanel.Dock="Top"
+                            HorizontalAlignment="Center"
+                            Height="50">
+                    <ToggleButton Width="50" 
+                                  Name="menuBtn"
+                                  Height="50">
+                        <avalonia:MaterialIcon Width="35" 
+                                               Foreground="White"
+                                               Height="35" 
+                                               Kind="Menu"/>
+                    </ToggleButton>    
+                    <TextBlock IsVisible="{Binding $parent[SplitView].IsPaneOpen}" 
+                               Text="Task Management"
+                               VerticalAlignment="Center"
+                               Foreground="White"
+                               Classes="headline6"/>
+                </StackPanel>
+                <StackPanel DockPanel.Dock="Bottom"
+                            Height="50"
+                            Spacing="15"
+                            Margin="0,0,0,10"
+                            HorizontalAlignment="Center"
+                            Orientation="Horizontal">
+                    <Border Width="50" 
+                               Height="50"
+                               CornerRadius="50"
+                               Background="White">
+                        <TextBlock Text="{Binding UserInfo.Name[0]}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Classes="headline4"
+                                   />
+                    </Border>
+                    <StackPanel IsVisible="{Binding $parent[SplitView].IsPaneOpen}" 
+                                Orientation="Vertical" 
+                                VerticalAlignment="Center"
+                                Spacing="2">
+                        <TextBlock Classes="subtitle2"
+                                   IsVisible="{Binding}"
+                                   Foreground="White">
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="{}{0} {1}">
+                                    <Binding Path="UserInfo.Surname"></Binding>
+                                    <Binding Path="UserInfo.Name"></Binding>
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                        <TextBlock
+                            Classes="body2"
+                            Foreground="LightSlateGray"
+                            Text="{Binding UserInfo.TypeUser.Name}"/>
+                    </StackPanel>
+                </StackPanel>
+                <ListBox
+                    Padding="0"
+                    ItemsSource="{Binding MenuItems}"
+                    SelectedItem="{Binding SelectedMenuItem}"
+                    Margin="10,10"
+                    DockPanel.Dock="Top">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="m:MenuItem">
+                            <DockPanel Height="50" HorizontalAlignment="Stretch">
+                                <avalonia:MaterialIcon Width="26"
+                                                       Height="26"
+                                                       DockPanel.Dock="Left"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center"
+                                                       Margin="12,0"
+                                                       Kind="{Binding Icon}"/>
+                                <TextBlock Classes="headline6"
+                                           VerticalAlignment="Center"
+                                           DockPanel.Dock="Left"
+                                           MaxLines="2"
+                                           IsVisible="{Binding $parent[SplitView].IsPaneOpen}"
+                                           TextWrapping="Wrap"
+                                           Text="{Binding Title}"/>
+                            </DockPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                    <ListBox.Styles>
+                        <Style Selector="ListBox > ListBoxItem">
+                            <Setter Property="Foreground" Value="White"></Setter>
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
+                        </Style>
+                    </ListBox.Styles>
+                </ListBox>
+            </DockPanel>
+        </SplitView.Pane>
+        <DockPanel Margin="10">
+            <DockPanel DockPanel.Dock="Top" 
+                       Height="50">
+                <Button IsVisible="{Binding ViewNavigator.CanGoBack}"
+                        Height="32"
+                        Classes="outline accent"
+                        DockPanel.Dock="Left"
+                        ToolTip.Tip="Вернуться назад"
+                        Command="{Binding ViewNavigator.GoBack}"
+                        VerticalAlignment="Center"
+                        Margin="15,0"
+                        Width="32">
+                    <avalonia:MaterialIcon Kind="ArrowLeft" Height="16" Width="16"></avalonia:MaterialIcon>
+                </Button>
+                <TextBlock
+                    Classes="headline4"
+                    VerticalAlignment="Center"
+                    Text="{Binding ViewNavigator.SelectedViewModel.Title}"/>
+            </DockPanel>
+            <ContentControl Margin="0,10,0,0" Content="{Binding ViewNavigator.SelectedViewModel}">
+            
+            </ContentControl>
+        </DockPanel>
+    </SplitView>
+
+</Window>

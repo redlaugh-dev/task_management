@@ -1,0 +1,64 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:TaskManagement.ViewModels"
+             x:DataType="vm:EditTaskViewModel"
+             xmlns:convs="using:TaskManagement.Converters"
+             xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="TaskManagement.Views.EditTaskView">
+    <UserControl.Resources>
+        <convs:DateOnlyConverter x:Key="DateOnlyConverter"></convs:DateOnlyConverter>
+    </UserControl.Resources>
+    <StackPanel HorizontalAlignment="Left" 
+                Orientation="Vertical" 
+                Spacing="10" 
+                Width="350">
+        <TextBox Watermark="Название задачи"
+                 Name="titleBox"
+                 MaxLength="200"
+                 Text="{Binding Task.Title}"/>
+        <TextBox 
+            Name="descBox"
+            MaxLength="500"
+            Height="150"
+            TextWrapping="Wrap"
+            AcceptsReturn="True"
+            assists:TextFieldAssist.Label="Описание задачи"
+            Classes="outline" Theme="{StaticResource OutlineTextBox}"
+            UseFloatingWatermark="True"
+            IsEnabled="{Binding ElementName=titleBox, Path=Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+            Text="{Binding Task.Description}"/>
+        <DatePicker Name="datePicker" 
+                    IsEnabled="{Binding ElementName=descBox, Path=Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                    SelectedDate="{Binding Task.Date, Converter={StaticResource DateOnlyConverter}}"/>
+        <ComboBox PlaceholderText="Работник" 
+                  Name="userCBox"
+                  IsEnabled="{Binding ElementName=descBox, Path=Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                  IsTextSearchEnabled="True"
+                  SelectedValue="{Binding Task.ExecutorId}"
+                  SelectedValueBinding="{Binding Id}"
+                  ItemsSource="{Binding Users}">
+            <ComboBox.DisplayMemberBinding>
+                <MultiBinding StringFormat="{} {0} {1}">
+                    <Binding Path="Surname"></Binding>
+                    <Binding Path="Name"></Binding>
+                </MultiBinding>
+            </ComboBox.DisplayMemberBinding>
+        </ComboBox>
+        <ComboBox PlaceholderText="Статус" 
+                  Name="statusCbox"
+                  IsEnabled="{Binding ElementName=userCBox, Path=SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"
+                  IsTextSearchEnabled="True"
+                  SelectedValue="{Binding Task.StatusId}"
+                  SelectedValueBinding="{Binding Id}"
+                  DisplayMemberBinding="{Binding Name}"
+                  ItemsSource="{Binding StatusTasks}">
+        </ComboBox>
+        <Button IsEnabled="{Binding ElementName=statusCbox, Path=SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"
+                Command="{Binding SaveCommand}">
+            Сохранить
+        </Button>
+    </StackPanel>
+</UserControl>

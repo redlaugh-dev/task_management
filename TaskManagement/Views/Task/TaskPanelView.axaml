@@ -1,0 +1,296 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:vm="using:TaskManagement.ViewModels"
+             x:DataType="vm:TaskPanelViewModel"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+             xmlns:models="clr-namespace:TaskManagement.Models"
+             xmlns:convs="clr-namespace:TaskManagement.Converters"
+             xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="TaskManagement.Views.TaskPanelView">
+    <UserControl.Styles>
+        <Style Selector="Expander">
+            <Setter Property="VerticalAlignment" Value="Top" />
+        </Style>
+        <Style Selector="Expander:expanded">
+            <Setter Property="VerticalAlignment" Value="Stretch" />
+        </Style>
+    </UserControl.Styles>
+    <UserControl.Resources>
+        <x:String x:Key="EMPL">EMPL</x:String>
+        <x:String x:Key="ADMINMANAGER">ADMINMANAGER</x:String>
+        <x:String x:Key="ADMINEMPL">ADMINEMPL</x:String>
+        <convs:DateOnlyConverter x:Key="DateOnlyConverter"></convs:DateOnlyConverter>
+        <convs:UserRoleToBoolConverter x:Key="UserRoleToBoolConverter"></convs:UserRoleToBoolConverter>
+    </UserControl.Resources>
+    <Grid>
+        <DockPanel>
+            <DockPanel Height="50"
+                       DockPanel.Dock="Top">
+                <TextBox
+                    DockPanel.Dock="Left"
+                    Watermark="Поиск"
+                    Width="350"
+                    Text="{Binding TaskFilters.SearchString, Delay=350}">
+                    <TextBox.InnerLeftContent>
+                        <avalonia:MaterialIcon Margin="5" Kind="Search" />
+                    </TextBox.InnerLeftContent>
+                </TextBox>
+                <Button
+                    Margin="10"
+                    Classes="outline mid"
+                    Width="32"
+                    IsVisible="{Binding ClearFiltersVisible}"
+                    Height="32"
+                    ToolTip.Tip="Сбросить фильтры"
+                    Command="{Binding ClearFilters}"
+                    DockPanel.Dock="Right">
+                    <avalonia:MaterialIcon Width="16" Height="16" Kind="FilterOffOutline"></avalonia:MaterialIcon>
+                </Button>
+                <DatePicker Width="150"
+                            DockPanel.Dock="Right"
+                            Margin="5,0"
+                            SelectedDate="{Binding TaskFilters.Date, Converter={StaticResource DateOnlyConverter}}" />
+                <ComboBox Width="200"
+                          Margin="5,0"
+                          ItemsSource="{Binding StatusTasks}"
+                          DisplayMemberBinding="{Binding Name}"
+                          PlaceholderText="Статус задачи"
+                          SelectedValue="{Binding TaskFilters.StatusId}"
+                          SelectedValueBinding="{Binding Id}"
+                          DockPanel.Dock="Right">
+                </ComboBox>
+                <ComboBox Width="200"
+                          Margin="5,0"
+                          ItemsSource="{Binding Users}"
+                          PlaceholderText="Исполнитель"
+                          IsVisible="{Binding $parent[UserControl].((vm:TaskPanelViewModel)DataContext).RoleId, 
+                                                                Converter={StaticResource UserRoleToBoolConverter},
+                                                                ConverterParameter={StaticResource ADMINMANAGER}}"
+                          SelectedValue="{Binding TaskFilters.ExecutorId}"
+                          SelectedValueBinding="{Binding Id}"
+                          DockPanel.Dock="Right">
+                    <ComboBox.DisplayMemberBinding>
+                        <MultiBinding StringFormat="{} {0} {1}">
+                            <Binding Path="Surname"></Binding>
+                            <Binding Path="Name"></Binding>
+                        </MultiBinding>
+                    </ComboBox.DisplayMemberBinding>
+                </ComboBox>
+                <Border DockPanel.Dock="Left"></Border>
+            </DockPanel>
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <ItemsControl
+                    ItemsSource="{Binding Categories}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Expander
+                                Margin="0,10">
+                                <Expander.Header>
+                                    <StackPanel Spacing="10"
+                                                Orientation="Horizontal">
+                                        <TextBlock Text="{Binding Key}" />
+                                        <Border Width="25"
+                                                Height="25"
+                                                BorderThickness="1"
+                                                BorderBrush="Black"
+                                                CornerRadius="25">
+                                            <TextBlock HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center"
+                                                       Classes="body2"
+                                                       Text="{Binding Value.Count}">
+                                            </TextBlock>
+                                        </Border>
+                                    </StackPanel>
+                                </Expander.Header>
+                                <DataGrid ItemsSource="{Binding Value}"
+                                          Height="300"
+                                          RowHeight="50">
+                                    <DataGrid.Columns>
+                                        <DataGridTemplateColumn Header="Задача" Width="400">
+                                            <DataTemplate x:DataType="models:TaskInfo">
+                                                <TextBlock Classes="subtitle1"
+                                                           MaxLines="2"
+                                                           TextWrapping="Wrap"
+                                                           Text="{Binding Title}" />
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn>
+                                        <DataGridTemplateColumn Header="Статус" Width="120">
+                                            <DataTemplate x:DataType="models:TaskInfo">
+                                                <TextBlock Classes="subtitle2"
+                                                           Text="{Binding Status.Name}" />
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn>
+                                        <DataGridTemplateColumn Header="Дата" Width="150">
+                                            <DataTemplate x:DataType="models:TaskInfo">
+                                                <TextBlock Classes="subtitle2"
+                                                           Text="{Binding Date}" />
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn>
+                                        <DataGridTemplateColumn Header="Менеджер"
+                                                                IsVisible="{Binding $parent[UserControl].((vm:TaskPanelViewModel)DataContext).RoleId, 
+                                                                Converter={StaticResource UserRoleToBoolConverter},
+                                                                ConverterParameter={StaticResource ADMINEMPL}}"
+                                                                Width="250">
+                                            <DataTemplate x:DataType="models:TaskInfo">
+                                                <StackPanel Orientation="Horizontal"
+                                                            Spacing="15"
+                                                            Margin="0,10"
+                                                            Height="50">
+                                                    <Border Width="50"
+                                                            Height="50"
+                                                            VerticalAlignment="Center"
+                                                            CornerRadius="50"
+                                                            Background="CornflowerBlue">
+                                                        <TextBlock Text="{Binding AuthorInfo.Name[0]}"
+                                                                   HorizontalAlignment="Center"
+                                                                   VerticalAlignment="Center"
+                                                                   Foreground="White"
+                                                                   Classes="headline4" />
+                                                    </Border>
+                                                    <TextBlock Classes="subtitle2"
+                                                               VerticalAlignment="Center"
+                                                               IsVisible="{Binding}">
+                                                        <TextBlock.Text>
+                                                            <MultiBinding StringFormat="{}{0} {1}">
+                                                                <Binding Path="AuthorInfo.Surname"></Binding>
+                                                                <Binding Path="AuthorInfo.Name"></Binding>
+                                                            </MultiBinding>
+                                                        </TextBlock.Text>
+                                                    </TextBlock>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn>
+                                        <DataGridTemplateColumn Header="Исполнитель" 
+                                                                IsVisible="{Binding $parent[UserControl].((vm:TaskPanelViewModel)DataContext).RoleId, 
+                                                                Converter={StaticResource UserRoleToBoolConverter},
+                                                                ConverterParameter={StaticResource ADMINMANAGER}}"
+                                                                Width="250">
+                                            <DataTemplate x:DataType="models:TaskInfo">
+                                                <StackPanel Orientation="Horizontal"
+                                                            Spacing="15"
+                                                            Margin="0,10"
+                                                            Height="50">
+                                                    <Border Width="50"
+                                                            Height="50"
+                                                            VerticalAlignment="Center"
+                                                            CornerRadius="50"
+                                                            Background="CornflowerBlue">
+                                                        <TextBlock Text="{Binding ExecutorInfo.Name[0]}"
+                                                                   HorizontalAlignment="Center"
+                                                                   VerticalAlignment="Center"
+                                                                   Foreground="White"
+                                                                   Classes="headline4" />
+                                                    </Border>
+                                                    <TextBlock Classes="subtitle2"
+                                                               VerticalAlignment="Center">
+                                                        <TextBlock.Text>
+                                                            <MultiBinding StringFormat="{}{0} {1}">
+                                                                <Binding Path="ExecutorInfo.Surname"></Binding>
+                                                                <Binding Path="ExecutorInfo.Name"></Binding>
+                                                            </MultiBinding>
+                                                        </TextBlock.Text>
+                                                    </TextBlock>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn>
+                                        <DataGridTemplateColumn Width="200">
+                                            <DataTemplate x:DataType="models:TaskInfo">
+                                                <SplitButton Classes="down accent" Content="Действия">
+                                                    <SplitButton.Flyout>
+                                                        <MenuFlyout Placement="RightEdgeAlignedTop">
+                                                            <MenuItem Header="Описание задачи"
+                                                                      CommandParameter="{Binding Description}"
+                                                                      Command="{Binding $parent[UserControl].((vm:TaskPanelViewModel)DataContext).ShowDescriptionCommand}"
+                                                                      ></MenuItem>
+                                                            <MenuItem Header="Статус">
+                                                                <MenuItem IsVisible="{Binding $parent[UserControl].((vm:TaskPanelViewModel)DataContext).RoleId,  
+                                                                                    Converter={StaticResource UserRoleToBoolConverter},
+                                                                                    ConverterParameter={StaticResource EMPL}}"
+                                                                                    Command="{Binding $parent[UserControl].((vm:TaskPanelViewModel)DataContext).UpdateStatusTaskCommand}"
+                                                                          Header="Отметить как &quot;В работе&quot;">
+                                                                    <MenuItem.CommandParameter>
+                                                                        <MultiBinding>
+                                                                            <Binding Path="Id"></Binding>
+                                                                            <Binding>
+                                                                                <Binding.Source>
+                                                                                    <x:Int32>2</x:Int32>
+                                                                                </Binding.Source>
+                                                                            </Binding>
+                                                                        </MultiBinding>
+                                                                    </MenuItem.CommandParameter>
+                                                                </MenuItem>
+                                                                <MenuItem IsVisible="{Binding $parent[UserControl].((vm:TaskPanelViewModel)DataContext).RoleId,  
+                                                                                    Converter={StaticResource UserRoleToBoolConverter},
+                                                                                    ConverterParameter={StaticResource EMPL}}"
+                                                                          Command="{Binding $parent[UserControl].((vm:TaskPanelViewModel)DataContext).UpdateStatusTaskCommand}"
+                                                                          Header="Отметить как &quot;Выполнена&quot;">
+                                                                    <MenuItem.CommandParameter>
+                                                                        <MultiBinding>
+                                                                            <Binding Path="Id"></Binding>
+                                                                            <Binding>
+                                                                                <Binding.Source>
+                                                                                    <x:Int32>3</x:Int32>
+                                                                                </Binding.Source>
+                                                                            </Binding>
+                                                                        </MultiBinding>
+                                                                    </MenuItem.CommandParameter>
+                                                                </MenuItem>
+                                                                <MenuItem IsVisible="{Binding $parent[UserControl].((vm:TaskPanelViewModel)DataContext).RoleId,  
+                                                                                    Converter={StaticResource UserRoleToBoolConverter},
+                                                                                    ConverterParameter={StaticResource ADMINMANAGER}}"
+                                                                          Command="{Binding $parent[UserControl].((vm:TaskPanelViewModel)DataContext).UpdateStatusTaskCommand}"
+                                                                          Header="Отметить как &quot;Выполнена&quot;">
+                                                                    <MenuItem.CommandParameter>
+                                                                        <MultiBinding>
+                                                                            <Binding Path="Id"></Binding>
+                                                                            <Binding>
+                                                                                <Binding.Source>
+                                                                                    <x:Int32>4</x:Int32>
+                                                                                </Binding.Source>
+                                                                            </Binding>
+                                                                        </MultiBinding>
+                                                                    </MenuItem.CommandParameter>
+                                                                </MenuItem>
+                                                            </MenuItem>
+                                                            <MenuItem Header="Редактировать"
+                                                                      IsVisible="{Binding $parent[UserControl].((vm:TaskPanelViewModel)DataContext).RoleId,  
+                                                                                    Converter={StaticResource UserRoleToBoolConverter},
+                                                                                    ConverterParameter={StaticResource ADMINMANAGER}}"
+                                                                      CommandParameter="{Binding Id}"
+                                                                      Command="{Binding $parent[UserControl].((vm:TaskPanelViewModel)DataContext).GoToEdit}" />
+                                                            <MenuItem Header="Удалить"
+                                                                      IsVisible="{Binding $parent[UserControl].((vm:TaskPanelViewModel)DataContext).RoleId,  
+                                                                                    Converter={StaticResource UserRoleToBoolConverter},
+                                                                                    ConverterParameter={StaticResource ADMINMANAGER}}"
+                                                                      CommandParameter="{Binding Id}"
+                                                                      Command="{Binding $parent[UserControl].((vm:TaskPanelViewModel)DataContext).RemoveTaskCommand}" />
+                                                        </MenuFlyout>
+                                                    </SplitButton.Flyout>
+                                                </SplitButton>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </Expander>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </DockPanel>
+        <controls:FloatingButton Classes="Accent"
+                                 HorizontalAlignment="Right"
+                                 VerticalAlignment="Bottom"
+                                 Content="+"
+                                 IsVisible="{Binding $parent[UserControl].((vm:TaskPanelViewModel)DataContext).RoleId, 
+                                                                Converter={StaticResource UserRoleToBoolConverter},
+                                                                ConverterParameter={StaticResource ADMINMANAGER}}"
+                                 FontSize="20"
+                                 HorizontalContentAlignment="Center"
+                                 VerticalContentAlignment="Center"
+                                 Command="{Binding GoToAdd}"
+                                 Margin="10" />
+    </Grid>
+</UserControl>

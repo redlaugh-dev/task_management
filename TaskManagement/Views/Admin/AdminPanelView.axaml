@@ -1,0 +1,97 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:vm="using:TaskManagement.ViewModels"
+             xmlns:m="using:TaskManagement.Models"
+             xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+             x:DataType="vm:AdminPanelViewModel"
+             x:Class="TaskManagement.Views.AdminPanelView">
+    <Grid>
+        <DockPanel>
+        <TextBox
+            DockPanel.Dock="Top"
+            Watermark="Поиск по имени или фамилии"
+            MaxLength="100"
+            Text="{Binding SearchString, Delay=350}">
+            <TextBox.InnerLeftContent>
+                <avalonia:MaterialIcon Margin="5" Kind="Search"/>
+            </TextBox.InnerLeftContent>
+        </TextBox>
+        <DataGrid DockPanel.Dock="Bottom" 
+                  Margin="0,10"
+                  RowHeight="70"
+                  ItemsSource="{Binding Users}">
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn Header="Фамилия Имя" Width="350">
+                        <DataTemplate DataType="m:UserInfo">
+                            <StackPanel Orientation="Horizontal"
+                                        Spacing="15"
+                                        Margin="0,10"
+                                        Height="50">
+                                    <Border Width="50" 
+                                            Height="50"
+                                            VerticalAlignment="Center"
+                                            CornerRadius="50"
+                                            Background="CornflowerBlue">
+                                        <TextBlock Text="{Binding Name[0]}"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"
+                                                   Foreground="White"
+                                                   Classes="headline4"
+                                        />
+                                    </Border>
+                                <TextBlock Classes="subtitle2"
+                                           VerticalAlignment="Center"
+                                           IsVisible="{Binding}">
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}{0} {1}">
+                                            <Binding Path="Surname"></Binding>
+                                            <Binding Path="Name"></Binding>
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Width="250"
+                        Header="Роль">
+                        <DataTemplate DataType="m:UserInfo">
+                            <TextBlock Classes="subtitle2" 
+                                       VerticalAlignment="Center"
+                                       Text="{Binding TypeUser.Name}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Width="200"
+                                            >
+                        <DataTemplate DataType="m:UserInfo">
+                            <SplitButton Classes="down accent" Content="Действия">
+                                <SplitButton.Flyout>
+                                    <MenuFlyout Placement="RightEdgeAlignedTop">
+                                        <MenuItem Header="Редактировать" 
+                                                  CommandParameter="{Binding Id}"
+                                                  Command="{Binding $parent[DataGrid].((vm:AdminPanelViewModel)DataContext).GoToEditUserView}"/>
+                                        <MenuItem Header="Удалить" 
+                                                  CommandParameter="{Binding Id}"
+                                                  Command="{Binding $parent[DataGrid].((vm:AdminPanelViewModel)DataContext).RemoveUserCommand}"/>
+                                    </MenuFlyout>
+                                </SplitButton.Flyout>
+                            </SplitButton>
+                        </DataTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+        </DataGrid>
+    </DockPanel>
+        <controls:FloatingButton Classes="Accent" 
+                                 HorizontalAlignment="Right"
+                                 VerticalAlignment="Bottom"
+                                 Content="+"
+                                 FontSize="20"
+                                 HorizontalContentAlignment="Center"
+                                 VerticalContentAlignment="Center"
+                                 Command="{Binding GoToAddUserView}"
+                                 Margin="10"/>
+    </Grid>
+</UserControl>

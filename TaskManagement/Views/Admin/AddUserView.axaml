@@ -1,0 +1,48 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:vm="using:TaskManagement.ViewModels"
+             x:DataType="vm:AddUserViewModel"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="TaskManagement.Views.AddUserView">
+    <StackPanel HorizontalAlignment="Left" 
+                Orientation="Vertical" 
+                Spacing="10" 
+                Width="350">
+        <TextBox Watermark="Фамилия"
+                 Name="surnameBox"
+                 MaxLength="100"
+                 Text="{Binding User.Surname}"/>
+        <TextBox Watermark="Имя"
+                 Name="nameBox"
+                 MaxLength="100"
+                 IsEnabled="{Binding ElementName=surnameBox, Path=Text
+                 , Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                 Text="{Binding User.Name}"
+                 />
+        <TextBox Watermark="Логин"
+                 Name="loginBox"
+                 MaxLength="100"
+                 IsEnabled="{Binding ElementName=nameBox, Path=Text
+                 , Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                 Text="{Binding User.Login}"/>
+        <TextBox PasswordChar="*" 
+                 Name="passwordBox"
+                 Watermark="Пароль" 
+                 MaxLength="100"
+                 IsEnabled="{Binding ElementName=loginBox, Path=Text
+                 , Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                 Text="{Binding User.Password}"
+                 Classes="revealPasswordButton"/>
+        <ComboBox PlaceholderText="Роль" ItemsSource="{Binding TypeUsers}"
+                  Name="typeBox"
+                  DisplayMemberBinding="{Binding Name}"
+                  IsEnabled="{Binding ElementName=passwordBox, Path=Text
+                 , Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                  SelectedValue="{Binding User.TypeUserId}"
+                  SelectedValueBinding="{Binding Id}"/>
+        <Button Command="{Binding SaveCommand}"
+                IsEnabled="{Binding ElementName=typeBox, Path=SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}">Сохранить</Button>
+    </StackPanel>
+</UserControl>

@@ -1,0 +1,59 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+        xmlns:viewModels="clr-namespace:TaskManagement.ViewModels"
+        Width="500"
+        Height="500"
+        Icon="/Assets/avalonia-logo.ico"
+        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="500"
+        WindowStartupLocation="CenterScreen"
+        SystemDecorations="BorderOnly"
+        PointerPressed="InputElement_OnPointerPressed"
+        x:DataType="viewModels:AuthorizationViewModel"
+        x:Class="TaskManagement.Views.AuthorizationWindow"
+        Title="AuthorizationWindow">
+    <Grid>
+        <Button Width="32" 
+                Height="32"
+                IsEnabled="{Binding IsAuthorized}"
+                Classes="flat primary"
+                Margin="10"
+                Click="Button_OnClick"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top">
+            <avalonia:MaterialIcon Kind="ExitToApp" Width="16"></avalonia:MaterialIcon>
+        </Button>
+        <StackPanel Width="350" Orientation="Vertical" 
+                    Spacing="8"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+        <TextBlock Classes="Headline5">
+            <InlineUIContainer BaselineAlignment="Baseline">
+                <avalonia:MaterialIcon Width="20" Kind="CalendarCheck" />
+            </InlineUIContainer>
+            <Run>Авторизация в системе</Run>
+        </TextBlock>
+        <TextBox Text="{Binding Login}" MaxLength="100" Watermark="Логин"/>
+                <TextBox Text="{Binding Password}" 
+                         MaxLength="100" 
+                         PasswordChar="*"
+                         Classes="revealPasswordButton"
+                         Watermark="Пароль"/>
+                <Button Classes="accent"
+                        Name="authButton"
+                        Command="{Binding LoginCommand}"
+                        Content="Войти"/>
+    </StackPanel>
+        <ProgressBar Classes="circular" 
+                     Width="32" 
+                     Height="32"
+                     HorizontalAlignment="Right"
+                     VerticalAlignment="Bottom"
+                     Margin="10"
+                     IsVisible="{Binding !IsAuthorized}"
+                     IsIndeterminate="True"
+                     />
+    </Grid>
+</Window>
